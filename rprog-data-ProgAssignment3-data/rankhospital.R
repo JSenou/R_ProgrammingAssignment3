@@ -11,39 +11,28 @@ rankhospital <- function(state, outcome, num){
         if(outcome == "heart attack"){
                 outcome_col <- 11
                 name <- "Hospital.30.Day.Death..Mortality..Rates.from.Heart.Attack" 
-                for(i in 1:nrow(subset_state)){
-                        values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
-                        values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
-                }
-                rank_value <- values[num] # the value of outcome for the rank specified by num
-                hospital <- subset_state[which(subset_state$Hospital.30.Day.Death..Mortality..Rates.from.Heart.Attack == rank_value),]
-                hospital <- sort(hospital[,"Hospital.Name"])
+                all_hospitals <- subset_state[ , c("Hospital.Name", name)]
         }else if(outcome == "heart failure"){
                 outcome_col <- 17
                 name <- "Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure"  
-                for(i in 1:nrow(subset_state)){
-                        values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
-                        values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
-                }   
-                rank_value <- values[num] # the value of outcome for the rank specified by num
-                hospital <- subset_state[which(subset_state$Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure == rank_value),]
-                hospital <- sort(hospital[,"Hospital.Name"])
+                all_hospitals <- subset_state[ , c("Hospital.Name", name)]
         }else if(outcome ==  "pneumonia"){
                 outcome_col <- 23
                 name <- "Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia" 
-                for(i in 1:nrow(subset_state)){
-                        values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
-                        values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
-                }
-                rank_value <- values[num] # the value of outcome for the rank specified by num
-                hospital <- subset_state[which(subset_state$Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia == rank_value),]
-                hospital <- sort(hospital[,"Hospital.Name"])
+                all_hospitals <- subset_state[ , c("Hospital.Name", name)]
         }
-       
-#         for(i in 1:nrow(subset_state)){
-#                 values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
-#                 values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
-#         }
+        for(i in 1:nrow(subset_state)){
+                values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
+                values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
+        }
+        rank_value <- values[num] # the value of outcome for the rank specified by num
+        rank_hospitals <- character()  # this is where the relavant hospitals will be stored
+        for(i in 1:nrow(all_hospitals)){
+                if(all_hospitals[i,2] == rank_value){
+                        rank_hospitals[i] <- all_hospitals[i,"Hospital.Name"]
+                }
+        }
+#        hospital <- sort(hospital[,"Hospital.Name"])
 #        rank_value <- values[num] # the value of outcome for the rank specified by num
 #        hospital <- subset(subset_state, name == rank_value) #character() # vector will hold the names of the hospitals of the specified ranking
 #         for(i in 1:nrow(subset_state)){
@@ -53,5 +42,6 @@ rankhospital <- function(state, outcome, num){
 #         }
         print(values)
         print(length(values))
-        hospital
+        rank_hospitals <-sort(rank_hospitals)
+        rank_hospitals
 }
