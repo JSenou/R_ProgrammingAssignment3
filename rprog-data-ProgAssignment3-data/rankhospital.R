@@ -1,4 +1,4 @@
-source("best.R")
+
 rankhospital <- function(state, outcome, num){
         ## The purpose of this function is to find hospitals of a certain ranking = num
         ## Input: 2 letter state abbreviation, outcome = one of ("heart attack", "heart failure", "pneumonia"),
@@ -23,25 +23,19 @@ rankhospital <- function(state, outcome, num){
         }
         for(i in 1:nrow(subset_state)){
                 values[i] <- subset_state[i, outcome_col] # collecting all values for outcome
-                values <- unique(sort(as.numeric(values))) # ascending sort, removal of NAs and nique values of values vec
+                values <- sort(as.numeric(values)) # ascending sort, removal of NAs
         }
         rank_value <- values[num] # the value of outcome for the rank specified by num
-        rank_hospitals <- character()  # this is where the relavant hospitals will be stored
+        hospitals <- character()  # this is where the relavant hospitals will be stored
+        j <- 1
         for(i in 1:nrow(all_hospitals)){
-                if(all_hospitals[i,2] == rank_value){
-                        rank_hospitals[i] <- all_hospitals[i,"Hospital.Name"]
-                }
-        }
-#        hospital <- sort(hospital[,"Hospital.Name"])
-#        rank_value <- values[num] # the value of outcome for the rank specified by num
-#        hospital <- subset(subset_state, name == rank_value) #character() # vector will hold the names of the hospitals of the specified ranking
-#         for(i in 1:nrow(subset_state)){
-#                 if(subset_state[i, outcome] == rank_value){
-#                         hospital[i] <- subset_state[i, "Hospital.Name"]
-#                 }
-#         }
-        print(values)
-        print(length(values))
-        rank_hospitals <-sort(rank_hospitals)
-        rank_hospitals
+                 if(all_hospitals[i,2] == rank_value){
+                         hospitals[j] <- all_hospitals[i,"Hospital.Name"]
+                         j <- j + 1
+                 }
+         }
+        hospitals <- sort(hospitals)
+        source("index_hospital.R")
+        index <- index_hospital(values, num)
+        hospitals[index]
 }
