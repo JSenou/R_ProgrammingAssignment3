@@ -12,18 +12,21 @@ rankall <- function(outcome, num){
         data <- data[ , c("Hospital.Name", "State", name) ] # subsetting the data
         data[,c(name)] <- as.numeric(data[,c(name)])
         library(datasets) # use the dataset state.abb which contains all 50 state abbreviations
+        states <- c(state.abb, "DC")
+        states <- sort(states)
         hospitals <- character()
         too_big = logical()
-        for(i in 1:50){
+        reset_worst = FALSE
+        for(i in 1:51){
                 too_big = FALSE
-                state_info <- data[which(data$State == state.abb[i]), ] # contains all data but only for "state"
+                state_info <- data[which(data$State == states[i]), ] # contains all data but only for "state"
                 values <- state_info[,c(name)]
                 values <- sort(values)
-                #print(length(values))
                 if(num == "best"){
                         num <- 1
-                }else if(num == "worst"){
+                }else if(num == "worst" | reset_worst){
                         num <- length(values)
+                        reset_worst = TRUE
                 }
                 rank_value <- values[num]
                 temp <- character()
@@ -47,7 +50,7 @@ rankall <- function(outcome, num){
                 }             
                 hospitals[i] <- temp[index]
         }
-        rankings <- data.frame(hospitals,state.abb) # this will hold all the relevant rankings to be returned
+        rankings <- data.frame(hospitals,states) # this will hold all the relevant rankings to be returned
         names(rankings) <- c("hospital","state") # renaming the columns
-        print(rankings)
+        rankings
 }
