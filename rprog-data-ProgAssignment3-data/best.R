@@ -4,47 +4,41 @@ best <- function(state, outcome){
         ## outcome = one of ("heart attack", "heart failure", "pneumonia")
         ## Output: returns the hospital with the lowest 30 day mortality for outcome
         
+        ## reading in the data
         data <- read.csv("outcome-of-care-measures.csv", colClasses = "character") # reading the file
-        len <- nrow(data)
-        state_found = FALSE
-        for(i in 1:len){
-                if(data[i, "State"] == state){
-                        state_found = TRUE
-                        return
+
+        ## Checking the validity of the input arguments
+        library(datasets)
+        states <- c(state.abb, "DC")
+        outcomes <-c("heart attack", "heart failure", "pneumonia")
+        if(outcome %in% outcomes == FALSE){ stop("invalid outcome") }
+        if(state %in% states == FALSE){ stop("invalid state") }
+        
+        ## Filter data + simplify the column names
+        data <- data[c(2, 7, 11, 17, 23)]
+        names(data)[1] <- "hospital.name"
+        names(data)[2] <- "state"
+        names(data)[3] <- "heart attack"
+        names(data)[4] <- "heart failure"
+        names(data)[5] <- "pneumonia"
+
+        ## Gathering only the rows for the relevant state
+        subset_state <- data[data$state == state,] 
+
+        ## Finding the min value in the outcome col/relevant col
+        minimum <- min( as.numeric( subset_state[ ,outcome] ), na.rm = TRUE ) 
+
+        best_hospitals <- character() # this vector will hold the names of the best hospitals
+        
+        ## Searching and capturing hopitals with best rankings
+        for(i in 1:nrow(subset_state)){
+                if(is.na(as.numeric( subset_state[i ,outcome] ))){
+                        next
                 }
-        }
-        if(!state_found){
-                stop("invalid state")
-        }
-        subset_state <- data[which(data$State == state), ] # contains all data but only for "state"
-        row_num <- nrow(subset_state)
-        minimum <- character() # holds the best mortality rate
-        hospital <- character() # this vector will hold the names of the best hospitals
-        # the loops below calculate the min outcome, finds all hospitals with the min
-        if(outcome == "heart attack"){
-                minimum <- min(as.numeric(subset_state[ ,11]), na.rm = TRUE) 
-                for(i in 1:row_num){
-                       if(subset_state[i ,11] == as.character(minimum)){
-                                hospital[i] <- subset_state[i, "Hospital.Name"]
-                        }
+                else if(as.numeric( subset_state[i ,outcome] ) == minimum ){
+                        best_hospitals[i] <- subset_state[i, "hospital.name"]
                 }
-        }else if(outcome == "heart failure"){
-                minimum <- min(as.numeric(subset_state[ ,17]), na.rm = TRUE)
-                for(i in 1:row_num){
-                        if(subset_state[i ,17] == as.character(minimum)){
-                                hospital[i] <- subset_state[i, "Hospital.Name"]
-                        }
-                }
-        }else if(outcome ==  "pneumonia"){
-                minimum <- min(as.numeric(subset_state[ ,23]), na.rm = TRUE)
-                for(i in 1:row_num){
-                        if(subset_state[i ,23] == as.character(minimum)){
-                                hospital[i] <- subset_state[i, "Hospital.Name"]
-                        }
-                }
-        }else{
-                stop("invalid outcome")
-        }     
-        hospital <- sort(hospital) # abc order sorting
-        hospital[1]
+        }    
+        best_hospitals <- sort(best_hospitals) # abc order sorting
+        best_hospitals[1] # picking the first onea
 }
